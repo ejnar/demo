@@ -6,42 +6,39 @@ import com.nordea.demo.xml.Text;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+// -Xmx1024m
 public class Demo2 {
+
+    final Text text = new Text();
+    String tmp = "";
 
     public static void main(String[] args) {
 
         try {
-            new Demo2().read("large.in");
+            new Demo2().print("large.in");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void read (String path) throws IOException {
+    void print (String path) throws IOException {
 
-        String tmp = "";
-        Text text = new Text();
-        List<String> lineSentence = new ArrayList<>();
+        printoutXML(text, path);
 
-        Stream<String> lines = Files.lines(Paths.get(path));
-        lines.forEach(line -> {
-            //System.out.println(l);
-            stream(line, tmp, lineSentence, text);
-        });
-
-        generate(text);
+        printoutCVS(text, path);
     }
 
-    void stream(String line, String tmp, List<String> lineSentence, Text text){
+    void stream(String line, String tmp, Text text){
+
+        List<String> lineSentence = new ArrayList<>();
 
         if(tmp.length() > 0) {
             line = tmp + " " + line;
@@ -69,20 +66,42 @@ public class Demo2 {
         for (String word: words){
             sentence.setWord(word.trim());
         }
-        //Collections.sort(sentence.getWord(), String.CASE_INSENSITIVE_ORDER);
-
-        //List<String> sortedNames = sentence.getWord().stream().sorted().collect(Collectors.toList());
-        //sentence.setWord(sortedNames);
         text.setSentence(sentence);
     }
 
-    void generate(Text text){
+    void printoutXML(Text text, String path) throws IOException{
 
-        System.out.println(text.xmlBuilder());
+        StringBuilder builder = new StringBuilder();
+        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>").append("\n");
+        builder.append("<text>").append("\n");
+        System.out.println(builder);
 
-        System.out.println(text.cvsBuilder());
+        try (BufferedReader fileBufferReader = new BufferedReader(new FileReader(path), 1000 * 8192)) {
+            String line;
+            while ((line = fileBufferReader.readLine()) != null) {
+                stream(line, tmp, text);
+                text.xmlBuilder();
+            }
+        }
+        System.out.println("</text>");
+    }
+
+    void printoutCVS(Text text, String path) throws IOException{
+
+        StringBuilder builder = new StringBuilder();
+
+        //text.countWord();
+        try (BufferedReader fileBufferReader = new BufferedReader(new FileReader(path), 1000 * 8192)) {
+            String line;
+            while ((line = fileBufferReader.readLine()) != null) {
+                stream(line, tmp, text);
+                text.cvsBuilder();
+            }
+        }
 
     }
+
+
 
     void generateJaxb(Text text){
         try {

@@ -30,35 +30,34 @@ public class Text {
     }
 
 
-    public StringBuilder xmlBuilder() {
+    public void xmlBuilder() {
         StringBuilder builder = new StringBuilder();
-        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>").append("\n");
-        builder.append("<text>").append("\n");
         sentences.stream().forEach(s -> {
             builder.append("<sentence>").append(s.xmlBuilder()).append("</sentence>").append("\n");
+            sumOfWord = sumOfWord + s.getWord().size();
         });
-        builder.append("</text>").append("\n");
-        return builder;
+        sentences = new ArrayList<>();
+        if(builder.length() > 0)
+            System.out.println(builder);
     }
 
-    public StringBuilder cvsBuilder() {
-        AtomicInteger sumOfWord = new AtomicInteger();
+    public void countWord() {
         StringBuilder builder = new StringBuilder();
+        for(int i = 1; i <= sumOfWord; i++){
+            builder.append("Word ").append(i).append(", ");
+        }
+        System.out.println(builder);
+    }
 
-        builder.append("\n");
+
+    public void cvsBuilder() {
+        StringBuilder builder = new StringBuilder();
         sentences.stream().forEach(s -> {
-            sumOfWord.set(sumOfWord.get() + s.word.size());
             builder.append(s.cvsBuilder(index++)).append("\n");
         });
-
-        StringBuilder tmp = new StringBuilder();
-        for(int i = 1; i <= sumOfWord.get(); i++){
-            tmp.append("Word ").append(i).append(", ");
-
-        }
-        builder.insert(0, tmp);
-
-        return builder;
+        sentences = new ArrayList<>();
+        if(builder.length() > 0)
+            System.out.println(builder);
     }
 
 }
