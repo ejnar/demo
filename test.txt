@@ -1,0 +1,20 @@
+/ Task: Find longest matching prefix
+// Given a dictionary of words and an input string, find the longest prefix of the input string which is also a word in the dictionary.
+private static String[] dictionary = new String[] {"base", "cat", "cater", "children", "basement"}; // potential prefixes we look for
+
+
+
+public static String longestMatchingPrefix(String input) {
+return "TODO";
+}
+
+
+
+public static void testLongestMatchingPrefix() { // all should be true
+System.out.println(longestMatchingPrefix("caterer").equals("cater"));
+System.out.println(longestMatchingPrefix("basemexy").equals("base"));
+System.out.println(longestMatchingPrefix("basement").equals("basement"));
+System.out.println(longestMatchingPrefix("basements").equals("basement"));
+System.out.println(longestMatchingPrefix("child") == null);
+}
+
